@@ -1,0 +1,106 @@
+Assuming unrestricted shared filesystem usage.
+host: aa
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job               count
+--------------  -------
+bcftools_call         1
+bwa_map               1
+plot_quals            1
+samtools_index        2
+samtools_sort         2
+total                 7
+
+Select jobs to execute...
+Execute 1 jobs...
+[Sat Jan 24 00:24:55 2026]
+localrule samtools_sort:
+    input: mapped_reads/A.bam
+    output: sorted_reads/A.bam
+    jobid: 2
+    reason: Missing output files: sorted_reads/A.bam
+    wildcards: sample=A
+    resources: tmpdir=/tmp
+[Sat Jan 24 00:24:55 2026]
+Finished jobid: 2 (Rule: samtools_sort)
+1 of 7 steps (14%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Sat Jan 24 00:24:55 2026]
+localrule samtools_index:
+    input: sorted_reads/A.bam
+    output: sorted_reads/A.bam.bai
+    jobid: 6
+    reason: Missing output files: sorted_reads/A.bam.bai; Input files updated by another job: sorted_reads/A.bam
+    wildcards: sample=A
+    resources: tmpdir=/tmp
+[Sat Jan 24 00:24:55 2026]
+Finished jobid: 6 (Rule: samtools_index)
+2 of 7 steps (29%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Sat Jan 24 00:24:55 2026]
+localrule bwa_map:
+    input: data/genome.fa, data/samples/B.fastq
+    output: mapped_reads/B.bam
+    jobid: 5
+    reason: Missing output files: mapped_reads/B.bam
+    wildcards: sample=B
+    resources: tmpdir=/tmp
+[Sat Jan 24 00:24:56 2026]
+Finished jobid: 5 (Rule: bwa_map)
+3 of 7 steps (43%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Sat Jan 24 00:24:56 2026]
+localrule samtools_sort:
+    input: mapped_reads/B.bam
+    output: sorted_reads/B.bam
+    jobid: 4
+    reason: Missing output files: sorted_reads/B.bam; Input files updated by another job: mapped_reads/B.bam
+    wildcards: sample=B
+    resources: tmpdir=/tmp
+[Sat Jan 24 00:24:56 2026]
+Finished jobid: 4 (Rule: samtools_sort)
+4 of 7 steps (57%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Sat Jan 24 00:24:56 2026]
+localrule samtools_index:
+    input: sorted_reads/B.bam
+    output: sorted_reads/B.bam.bai
+    jobid: 7
+    reason: Missing output files: sorted_reads/B.bam.bai; Input files updated by another job: sorted_reads/B.bam
+    wildcards: sample=B
+    resources: tmpdir=/tmp
+[Sat Jan 24 00:24:56 2026]
+Finished jobid: 7 (Rule: samtools_index)
+5 of 7 steps (71%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Sat Jan 24 00:24:56 2026]
+localrule bcftools_call:
+    input: data/genome.fa, sorted_reads/A.bam, sorted_reads/B.bam, sorted_reads/A.bam.bai, sorted_reads/B.bam.bai
+    output: calls/all.vcf
+    jobid: 1
+    reason: Missing output files: calls/all.vcf; Input files updated by another job: sorted_reads/B.bam, sorted_reads/A.bam.bai, sorted_reads/B.bam.bai, sorted_reads/A.bam
+    resources: tmpdir=/tmp
+[Sat Jan 24 00:24:56 2026]
+Finished jobid: 1 (Rule: bcftools_call)
+6 of 7 steps (86%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Sat Jan 24 00:24:56 2026]
+localrule plot_quals:
+    input: calls/all.vcf
+    output: plots/quals.svg
+    jobid: 0
+    reason: Missing output files: plots/quals.svg; Input files updated by another job: calls/all.vcf
+    resources: tmpdir=/tmp
+[Sat Jan 24 00:24:58 2026]
+Finished jobid: 0 (Rule: plot_quals)
+7 of 7 steps (100%) done
+Complete log(s): /home/cwu/snakemake-tutorial/.snakemake/log/2026-01-24T002455.090996.snakemake.log

@@ -1,0 +1,19 @@
+[workspace]
+authors = ["chenhao2887 <chenhao.wu@etudiant.univ-rennes.fr>"]
+channels = ["conda-forge", "bioconda"]
+name = "snakemake-tutorial"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+snakemake-minimal = ">=9.7.1"
+jinja2 = "*"
+matplotlib = "*"
+graphviz = "*"
+bcftools = ">=1.19"
+samtools = ">=1.19"
+bwa = "~=0.7.17"
+pygments = "*"
+pysam = "0.22.*"

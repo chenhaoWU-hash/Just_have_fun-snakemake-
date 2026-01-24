@@ -1,0 +1,25 @@
+Assuming unrestricted shared filesystem usage.
+host: aa
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job        count
+-------  -------
+bwa_map        1
+total          1
+
+Select jobs to execute...
+Execute 1 jobs...
+[Fri Jan 23 19:15:56 2026]
+localrule bwa_map:
+    input: data/genome.fa, data/samples/A.fastq
+    output: mapped_reads/A.bam
+    jobid: 0
+    reason: Missing output files: mapped_reads/A.bam
+    resources: tmpdir=/tmp
+[Fri Jan 23 19:15:57 2026]
+Finished jobid: 0 (Rule: bwa_map)
+1 of 1 steps (100%) done
+Complete log(s): /home/cwu/snakemake-tutorial/.snakemake/log/2026-01-23T191556.141039.snakemake.log

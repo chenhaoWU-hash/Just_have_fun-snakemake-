@@ -12,8 +12,9 @@ rule bwa_map:
         "data/samples/{sample}.fastq"
     output:
         "mapped_reads/{sample}.bam"
+    threads: 8
     shell:
-        "bwa mem {input} | samtools view -Sb - > {output}"
+        "bwa mem -t {threads} {input} | samtools view -Sb - > {output}"
 
 rule samtools_sort:
     input:

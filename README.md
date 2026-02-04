@@ -50,8 +50,23 @@ Snakemake allows generalizing rules by using named wildcards. Simply replace the
     shell:
         "bwa mem {input} | samtools view -Sb - > {output}"
 ```  
-Snakemake infers the value of the wildcard based on the specific output filename you request (e.g. {sample}=A).This value will automatically substitute into all {sample} positions within the input/output, determining which inputs are required for this job. So to prevent multiple jobs from writing to the same file in parallel, all outputs of the same rule must contain an identical set of wildcards.  
+Snakemake infers the value of the wildcard based on the specific output filename you request (e.g. {sample}=A).This value will automatically substitute into all {sample} positions within the input/output, determining which inputs are required for this job. So to prevent multiple jobs from writing to the same file in parallel, all outputs of the same rule must contain an identical set of wildcards. For exemple: 
+```snakemake -np mapped_reads/B.bam```  
+Snakemake will determine that the rule bwa_map can be applied to generate the target file by replacing the wildcard {sample} with the value B.  
+
+We can also specify multiple targets:  
+```snakemake -np mapped_reads/A.bam mapped_reads/B.bam```  
+```snakemake -np mapped_reads/{A,B}.bam```  
+
+In both cases, Snakemake only proposes to create the output file mapped_reads/B.bam.  bcs we executed the workflow before and no input file is newer than the output file mapped_reads/A.bam. 
+
+to modify update the file modification date of the input file, we can:  
+```touch data/samples/A.fastq``` then rerun with ``` snakemake -np mapped_reads/A.bam mapped_reads/B.bam```  
+
+
+
 **Step 3 Sorting read alignments**  
+
 **Step 4 Indexing read alignments and visualizing the DAG of jobs**  
 ***exercise***  
 **Step 5 Calling genomic variants**  

@@ -23,8 +23,34 @@ Then create and activate the env:
 Now it's time to start.
 
 **Step 1 Mapping reads**  
-Create a new file called Snakefile. The first Snakemake rule maps reads of a given sample to a given reference genome. For this we used tool bwa,specifically the subcommand bwa mem (already install from pixi when we prepare the enviroment). Then define the first rule bwa_map in Snakefile.
+Create a new file called Snakefile. The first Snakemake rule maps reads of a given sample to a given reference genome. For this we used tool bwa,specifically the subcommand bwa mem (already install from pixi when we prepare the enviroment). Then define the first rule bwa_map in Snakefile.  
+
+```
+rule bwa_map:
+    input:
+        "data/genome.fa",
+        "data/samples/A.fastq"
+    output:
+        "mapped_reads/A.bam"
+    shell:
+        "bwa mem {input} | samtools view -Sb - > {output}"
+```  
+excude the first workflow, Snakemake tries to generate given target files. Target files can be specified via the command line(A.bam files is provide by this tutorial in mapped_read directory).  
+```snakemake -np mapped_reads/A.bam```  
+
 **Step 2 Generalizing the read mapping rule**  
+Snakemake allows generalizing rules by using named wildcards. Simply replace the A in the second input file and in the output file with the wildcard {sample}  
+
+```rule bwa_map:
+    input:
+        "data/genome.fa",
+        "data/samples/{sample}.fastq"
+    output:
+        "mapped_reads/{sample}.bam"
+    shell:
+        "bwa mem {input} | samtools view -Sb - > {output}"
+```  
+
 **Step 3 Sorting read alignments**  
 **Step 4 Indexing read alignments and visualizing the DAG of jobs**  
 ***exercise***  

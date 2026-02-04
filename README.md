@@ -50,7 +50,7 @@ Snakemake allows generalizing rules by using named wildcards. Simply replace the
     shell:
         "bwa mem {input} | samtools view -Sb - > {output}"
 ```  
-
+Snakemake infers the value of the wildcard based on the specific output filename you request (e.g. {sample}=A).This value will automatically substitute into all {sample} positions within the input/output, determining which inputs are required for this job. So to prevent multiple jobs from writing to the same file in parallel, all outputs of the same rule must contain an identical set of wildcards.  
 **Step 3 Sorting read alignments**  
 **Step 4 Indexing read alignments and visualizing the DAG of jobs**  
 ***exercise***  

@@ -101,11 +101,83 @@ Run parts of the workflow using different targets. Recreate the DAG and see how 
 For details, please refer to dag.svg and dag2.svg  by running the code with different status.  
 
 **Step 5 Calling genomic variants**  
+The next step in our workflow will aggregate the mapped reads from all samples and jointly call genomic variants on them. For the variant calling, we will combine the two utilities samtools and bcftools.  
+Samtools: Reading/writing/editing/indexing/viewing SAM/BAM/CRAM format  
+BCFtools: Reading/writing BCF2/VCF/gVCF files and calling/filtering/summarising SNP and short indel sequence variants  
+
+Add the sample list at the very top of the Snakefile with:
+```SAMPLES = ["A", "B"]```  
+Then add the following rule:
+```rule bcftools_call:
+    input:
+        fa="data/genome.fa",
+        bam=expand("sorted_reads/{sample}.bam", sample=SAMPLES),
+        bai=expand("sorted_reads/{sample}.bam.bai", sample=SAMPLES)
+    output:
+        "calls/all.vcf"
+    shell:
+        "bcftools mpileup -f {input.fa} {input.bam} | "
+        "bcftools call -mv - > {output}"
+```
+because for variant calling, we need to combined all sorted BAM files (A, B...) as input for the same rule, that's why we need expand() explicitly tell it which samples are available. Output: calls/all.vcf (only one file, without {sample}) It requires listing all input files for each sample, such as:
+
+```sorted_reads/A.bam```, ```sorted_reads/B.bam```, along with their corresponding indexes: ```sorted_reads/A.bam.bai```, ```sorted_reads/B.bam.bai``` Generate a Python list: ```["sorted_reads/A.bam","sorted_reads/A.bam.bai","sorted_reads/B.bam","sorted_reads/B.bam.bai"]```  
+Snakemake won't searching the require file by itself, so we need to tell it which input are we looking for, and the sample names contained with A & B in this tutorial.
+
 ***exercise***  
+obtain the updated DAG of jobs for the target file calls/all.vcf, it's actually the process we have so far.  
 ```snakemake calls/all.vcf --dag | dot -Tsvg > dag_all.svg```  
 
 **Step 6 Using custom scripts**  
+Although Snakemake permits Python code to be written directly within rules, it is more advisable to place such logic in separate script files and invoke them within rules using the `script:` directive.  
+```rule plot_quals:
+    input:
+        "calls/all.vcf"
+    output:
+        "plots/quals.svg"
+    script:
+        "scripts/plot-quals.py"
+```
+The actual Python code to generate the plot is hidden in the script scripts/plot-quals.py. Script paths are always relative to the referring Snakefile. Create the file scripts/plot-quals.py, with the following content:
+```
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from pysam import VariantFile
+
+quals = [record.qual for record in VariantFile(snakemake.input[0])]
+plt.hist(quals)
+
+plt.savefig(snakemake.output[0])
+```
+Here we want to generate a quals plot by using a python script, In Python scripts triggered by `script:`, `snakemake.input` and `snakemake.output`, only indicates the list of input and output files defined and parsed for the current rule (current job) within the Snakefile. It is also possible to use R scripts.  
+
 **Step 7 Adding a target rule**  
+Snakemake can use filenames or rule names without wildcards as run targets. If no target is specified on the command line, it defaults to executing the first rule in the Snakefile. Therefore, it is advisable to place a rule named `all` at the top, which aggregates all final outputs, as the default target.  
+```rule all:
+    input:
+        "plots/quals.svg"
+```  
+Snakemake resolves dependencies by constructing a DAG based on input/output filename matching, rather than determining execution order through rule sequencing.
+
+Now, we excuted with:  
+``` snakemake -n```  
+In case you have multiple reasonable sets of target files, you can add multiple target rules at the top of the Snakefile. While Snakemake will execute the first per default, you can target any of them via the command line (for example, snakemake -n mytarget).Therefore, when no target is specified, Snakemake treats the default target as "generating plots/quals.svg" and prints the execution plan detailing which rules/steps need to be executed for this purpose.  
+
 ***exercise***  
+Create the DAG of jobs for the complete workflow.  
+```snakemake --dag | dot -Tsvg > dag.svg```  
+
+Execute the complete workflow and have a look at the resulting plots/quals.svg.  
+```snakemake --cores 8```
+
+Snakemake provides handy flags for forcing re-execution of parts of the workflow. Have a look at the command line help with snakemake --help and search for the flag --forcerun. Then, use this flag to re-execute the rule samtools_sort and see what happens.  
+```snakemake -np --forcerun samtools_sort```  
+
+Snakemake displays the reason for each job (under reason:). Perform a dry-run that forces some rules to be reexecuted (using the --forcerun flag in combination with some rulename) to understand the decisions of Snakemake.
+```snakemake -np --forcerun samtools_sort,bcftools_call```  
+
+
+
 
 

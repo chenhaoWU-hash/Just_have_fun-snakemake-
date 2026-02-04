@@ -1,6 +1,6 @@
 # Just_have_fun-snakemake-
 
-This is an exercise following the official Snakemake tutorial, along with some notes from the practice.
+This is an exercise following the official Snakemake tutorial, along with some notes from the practice.(https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html).
 It is good to know that the exemple from the tutorial is actually in bioinformatics,which help me understanding faster this workflow.  
 
 In setup parts,I chose pixi for the package management. I use vscode for daily coding, and need to connect to the selected terminal via the icon in the bottom-left corner. this is use to determine the working path.  As I'm working in my personal computer, and I already use linux before, setting up the enviroment are very smoothly by following the steps:  
@@ -22,8 +22,8 @@ Then create and activate the env:
 
 Now it's time to start.
 
-
 **Step 1 Mapping reads**  
+Create a new file called Snakefile. The first Snakemake rule maps reads of a given sample to a given reference genome. For this we used tool bwa,specifically the subcommand bwa mem (already install from pixi when we prepare the enviroment). Then define the first rule bwa_map in Snakefile.
 **Step 2 Generalizing the read mapping rule**  
 **Step 3 Sorting read alignments**  
 **Step 4 Indexing read alignments and visualizing the DAG of jobs**  

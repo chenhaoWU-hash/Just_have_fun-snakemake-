@@ -63,12 +63,43 @@ In both cases, Snakemake only proposes to create the output file mapped_reads/B.
 to modify update the file modification date of the input file, we can:  
 ```touch data/samples/A.fastq``` then rerun with ``` snakemake -np mapped_reads/A.bam mapped_reads/B.bam```  
 
-
-
 **Step 3 Sorting read alignments**  
+ Sorted the read alignments in the BAM files with the samtools sort command. We add the following rule beneath the bwa_map rule:  
+
+ ```rule samtools_sort:
+    input:
+        "mapped_reads/{sample}.bam"
+    output:
+        "sorted_reads/{sample}.bam"
+    shell:
+        "samtools sort -T sorted_reads/{wildcards.sample} "
+        "-O bam {input} > {output}"
+```
+Snakemake automatically creates missing directories before jobs are executed. In addition to using the string format {sample} (input/output), Snakemake also provides an object named `wildcards` {wildcards.sample} for accessing wildcard values.
 
 **Step 4 Indexing read alignments and visualizing the DAG of jobs**  
+Next, we need to use samtools again to index the sorted read alignments so that we can quickly access reads by the genomic location they were mapped to. This can be done with the following rule:  
+
+```rule samtools_index:
+    input:
+        "sorted_reads/{sample}.bam"
+    output:
+        "sorted_reads/{sample}.bam.bai"
+    shell:
+        "samtools index {input}"
+```  
+Having three steps already, it is a good time to take a closer look at the resulting directed acyclic graph (DAG) of jobs. By executing:  
+
+```snakemake sorted_reads/{A,B}.bam.bai --dag | dot -Tsvg > dag.svg```  
+
+We create a visualization of the DAG using the dot command provided by Graphviz.The DAG contains a node for each job with the edges connecting them representing the dependencies. The frames of jobs that don’t need to be run (because their output is up-to-date) are dashed. For rules with wildcards, the value of the wildcard for the particular job is displayed in the job node. 
+
+
 ***exercise***  
+Run parts of the workflow using different targets. Recreate the DAG and see how different rules’ frames become dashed because their output is present and up-to-date.  
+
+For details, please refer to dag.svg and dag2.svg  by running the code with different status.  
+
 **Step 5 Calling genomic variants**  
 ***exercise***  
 ```snakemake calls/all.vcf --dag | dot -Tsvg > dag_all.svg```  
